@@ -1,0 +1,23 @@
+version: "3.3"
+services:
+  worker:
+    image: derhenning/crypto-db:latest
+    environment: 
+      - DEBUG=false                             ## true for debug log messages
+      - SYMBOLS=[\"BTCUSDT\"]                   ## Symbols as JSON array
+      - START_DATE="Januar 01, 2020"            ## Beginn of time series
+      - SLEEP_TIME=60                           ## Time to wait till next scan in seconds - default 60 seconds
+      - BINANCE_API_KEY=                        ## your Binance API Key
+      - BINANCE_API_SECRET=                     ## your Binance API Secret
+      - TIMESCALE_HOST=db
+      - TIMESCALE_PORT=5432
+      - TIMESCALE_USERNAME=postgres
+      - TIMESCALE_PASSWORD=MyPassword
+  db:
+    image: timescale/timescaledb:latest-pg14
+    environment:
+      - POSTGRES_PASSWORD=MyPassword
+    ports:
+      - 5432:5432
+    volumes:
+      - /local/path/data:/var/lib/postgresql/data
