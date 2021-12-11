@@ -10,9 +10,10 @@ import sys
 from time import sleep
 
 config = {
+    'debug': True if environ.get("DEBUG", "").lower() in ('true', '1', 't') else False,
     'symbols': json.loads(environ.get("SYMBOLS", "[]")),
     'start_time': environ.get("START_DATE"),
-    'sleep_time': environ.get("SLEEP_TIME", 60),
+    'sleep_time': int(environ.get("SLEEP_TIME", 60)),
     'binance': {
         'api_key': environ.get("BINANCE_API_KEY"),
         'api_secret': environ.get("BINANCE_API_SECRET")
@@ -27,7 +28,7 @@ config = {
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.DEBUG,
+    level=logging.DEBUG if config['debug'] else logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S',
     handlers=[
         #logging.FileHandler(log_file, mode="w"),
@@ -35,18 +36,7 @@ logging.basicConfig(
     ])
 log = logging.getLogger('runner')
 
-def worker():
-    log.debug(config)
-    timescaleDB = TimescaleDB(**config['timescale'])
-    binance = Binance(**config['binance'])
-    try:
-        timescaleDB.createDatabase("binance", False)
-        log.info("DB binance created")
-    except DuplicateDatabase:
-        log.debug("DB binance already exists")
-
-    database = 'binance'
-
+def worker(timescaleDB, binance, database):
     for symbol in config['symbols']:
         log.info("Current Symbol: {}".format(symbol))
         try:
@@ -57,10 +47,10 @@ def worker():
 
         start_time = config['start_time']
         last_time = timescaleDB.getLastTimestamp(database, symbol)
-        first_timestamp = datetime.timestamp(timescaleDB.getFirstTimestamp(database, symbol))
+        first_time = timescaleDB.getFirstTimestamp(database, symbol)
         start_timestamp = helpers.convert_ts_str(start_time) / 1000
 
-        if start_timestamp and first_timestamp and start_timestamp < first_timestamp:
+        if start_timestamp and first_time and start_timestamp < datetime.timestamp(first_time):
             log.warn("Start time befor first timestamp in database")
             log.warn("Recreating table {}".format(symbol.lower()))
             timescaleDB.createTable(database, symbol, True)
@@ -73,10 +63,20 @@ def worker():
 
 
 def main():
+    log.debug(config)
+    timescaleDB = TimescaleDB(**config['timescale'])
+    binance = Binance(**config['binance'])
+    try:
+        timescaleDB.createDatabase("binance", False)
+        log.info("DB binance created")
+    except DuplicateDatabase:
+        log.debug("DB binance already exists")
+    database = 'binance'
+
     while True:
         log.info("Started crypto scanner")
         try:
-            worker()
+            worker(timescaleDB, binance, database)
         except:
             log.error("Job Error! - {0}".format(sys.exc_info()))
         finally:
