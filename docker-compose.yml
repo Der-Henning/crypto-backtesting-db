@@ -4,8 +4,8 @@ services:
     image: derhenning/crypto-db:latest
     environment: 
       - DEBUG=false                             ## true for debug log messages
-      - SYMBOLS=[\"BTCUSDT\"]                   ## Symbols as JSON array
-      - START_DATE="Januar 01, 2020"            ## Beginn of time series
+      - SYMBOLS=["BTCUSDT"]                     ## Symbols as JSON array
+      - START_DATE=Januar 01, 2020              ## Beginn of time series
       - SLEEP_TIME=60                           ## Time to wait till next scan in seconds - default 60 seconds
       - BINANCE_API_KEY=                        ## your Binance API Key
       - BINANCE_API_SECRET=                     ## your Binance API Secret
