@@ -22,17 +22,6 @@ class TimescaleDB():
             if connection:
                 connection.close()
 
-
-        # with psycopg2.connect(self.connStr) as conn:
-        #     conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-        #     conn.autocommit = True
-        #     cursor = conn.cursor()
-        #     if clear:
-        #         cursor.execute("DROP DATABASE {}".format(name.lower()))
-        #     cursor.execute("CREATE DATABASE {}".format(name.lower()))
-        #     #conn.commit()
-        #     cursor.close()
-
     def createTable(self, database, symbol, clear=False):
         with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:
             cursor = conn.cursor()

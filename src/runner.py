@@ -46,15 +46,15 @@ def worker(timescaleDB, binance, database):
             pass
 
         start_time = config['start_time']
-        last_time = timescaleDB.getLastTimestamp(database, symbol)
-        first_time = timescaleDB.getFirstTimestamp(database, symbol)
         start_timestamp = helpers.convert_ts_str(start_time) / 1000
+        first_time = timescaleDB.getFirstTimestamp(database, symbol)
 
         if start_timestamp and first_time and start_timestamp < datetime.timestamp(first_time):
-            log.warn("Start time befor first timestamp in database")
-            log.warn("Recreating table {}".format(symbol.lower()))
+            log.warning("Start time befor first timestamp in database")
+            log.warning("Recreating table {}".format(symbol.lower()))
             timescaleDB.createTable(database, symbol, True)
 
+        last_time = timescaleDB.getLastTimestamp(database, symbol)
         if last_time:
             start_time = str(last_time)
         klines_df = binance.get_klines(symbol, startTime=start_time)
