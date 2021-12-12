@@ -11,13 +11,28 @@ class TimescaleDB():
         self.connStr = "postgres://{}:{}@{}:{}/".format(self.username, self.password, self.host, self.port)
 
     def createDatabase(self, name, clear=False):
+        # try:
+        #     connection = psycopg2.connect(self.connStr,)
+        #     connection.autocommit = True
+        #     cursor = connection.cursor()
+            
+        #     if clear:
+        #         cursor.execute("DROP DATABASE {}".format(name.lower()))
+        #     cursor.execute("CREATE DATABASE {}".format(name.lower()))
+        #     cursor.close()
+        # finally:
+        #     if connection:
+        #         connection.close()
+
+
         with psycopg2.connect(self.connStr) as conn:
             conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+            conn.autocommit = True
             cursor = conn.cursor()
             if clear:
                 cursor.execute("DROP DATABASE {}".format(name.lower()))
             cursor.execute("CREATE DATABASE {}".format(name.lower()))
-            conn.commit()
+            #conn.commit()
             cursor.close()
 
     def createTable(self, database, symbol, clear=False):
