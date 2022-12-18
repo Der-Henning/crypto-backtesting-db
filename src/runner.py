@@ -31,10 +31,11 @@ logging.basicConfig(
     level=logging.DEBUG if config['debug'] else logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S',
     handlers=[
-        #logging.FileHandler(log_file, mode="w"),
+        # logging.FileHandler(log_file, mode="w"),
         logging.StreamHandler()
     ])
 log = logging.getLogger('runner')
+
 
 def worker(timescaleDB, binance, database):
     for symbol in config['symbols']:
@@ -42,7 +43,7 @@ def worker(timescaleDB, binance, database):
         try:
             timescaleDB.createTable(database, symbol)
         except:
-            ## psycopg2.DatabaseError: table "btcusdt" is already a hypertable
+            # psycopg2.DatabaseError: table "btcusdt" is already a hypertable
             pass
 
         start_time = config['start_time']
@@ -81,6 +82,7 @@ def main():
             log.error("Job Error! - {0}".format(sys.exc_info()))
         finally:
             sleep(config['sleep_time'])
+
 
 if __name__ == "__main__":
     main()

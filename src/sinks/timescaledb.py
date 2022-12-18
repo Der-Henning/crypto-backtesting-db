@@ -2,13 +2,15 @@ import psycopg2
 from pgcopy import CopyManager
 from sources import binanceColumns
 
+
 class TimescaleDB():
     def __init__(self, host, port, username, password):
         self.host = host
         self.port = port
         self.username = username
         self.password = password
-        self.connStr = "postgres://{}:{}@{}:{}/".format(self.username, self.password, self.host, self.port)
+        self.connStr = "postgres://{}:{}@{}:{}/".format(
+            self.username, self.password, self.host, self.port)
 
     def createDatabase(self, name, clear=False):
         try:
@@ -25,11 +27,12 @@ class TimescaleDB():
     def createTable(self, database, symbol, clear=False):
         with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:
             cursor = conn.cursor()
-            if clear: 
+            if clear:
                 cursor.execute("DROP TABLE {}".format(symbol.lower()))
             query_create_table = "CREATE TABLE IF NOT EXISTS {} ({})".format(
                 symbol.lower(),
-                (', '.join("{} {}".format(row[0], row[1]) for row in binanceColumns))
+                (', '.join("{} {}".format(row[0], row[1])
+                 for row in binanceColumns))
             )
             query_create_hypertable = "SELECT create_hypertable('{}', '{}')".format(
                 symbol.lower(),
@@ -52,29 +55,31 @@ class TimescaleDB():
             ts = self.getLastTimestamp(database, symbol)
             if ts:
                 cursor = conn.cursor()
-                cursor.execute("DELETE FROM {} WHERE time='{}'".format(symbol.lower(), ts))
+                cursor.execute(
+                    "DELETE FROM {} WHERE time='{}'".format(symbol.lower(), ts))
                 conn.commit()
                 cursor.close()
 
     def getLastTimestamp(self, database, symbol):
         with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT time FROM {} ORDER BY time DESC LIMIT 1".format(symbol.lower()))
+            cursor.execute(
+                "SELECT time FROM {} ORDER BY time DESC LIMIT 1".format(symbol.lower()))
             response = cursor.fetchone()
             ts = None
             if response:
                 ts = response[0]
             cursor.close()
             return ts
-            
+
     def getFirstTimestamp(self, database, symbol):
         with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT time FROM {} ORDER BY time ASC LIMIT 1".format(symbol.lower()))
+            cursor.execute(
+                "SELECT time FROM {} ORDER BY time ASC LIMIT 1".format(symbol.lower()))
             response = cursor.fetchone()
             ts = None
             if response:
                 ts = response[0]
             cursor.close()
             return ts
-            
