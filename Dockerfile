@@ -1,7 +1,7 @@
 FROM python:3.9-slim
 
 RUN apt-get update \
-    && apt-get install gcc -y \
+    && apt-get install gcc python3-dev libpq-dev -y \
     && apt-get clean
 
 RUN addgroup --gid 1001 --system crypto && \
