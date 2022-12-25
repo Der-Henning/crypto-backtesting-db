@@ -1,3 +1,4 @@
+from typing import NoReturn
 from os import environ
 import json
 from sinks import TimescaleDB
@@ -37,7 +38,7 @@ logging.basicConfig(
 log = logging.getLogger('runner')
 
 
-def worker(timescaleDB, binance, database):
+def worker(timescaleDB: TimescaleDB, binance: Binance, database: str) -> None:
     for symbol in config['symbols']:
         log.info("Current Symbol: {}".format(symbol))
         try:
@@ -63,7 +64,7 @@ def worker(timescaleDB, binance, database):
         timescaleDB.write(database, symbol, klines_df)
 
 
-def main():
+def main() -> NoReturn:
     log.debug(config)
     timescaleDB = TimescaleDB(**config['timescale'])
     binance = Binance(**config['binance'])

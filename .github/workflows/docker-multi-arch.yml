@@ -21,7 +21,7 @@ jobs:
           flavor: |
             suffix=${{ matrix.tag }},onlatest=true
           tags: |
-            type=ref,branch=dev
+            type=edge,branch=dev,suffix=-dev
             type=edge,branch=main,suffix=${{ matrix.tag }}
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
@@ -32,12 +32,11 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - uses: docker/setup-qemu-action@v2
       - uses: docker/setup-buildx-action@v2
-        id: buildx
       - uses: docker/build-push-action@v3
         with:
           context: .
           file: Dockerfile
-          platforms: linux/arm64, linux/amd64, linux/arm/v7, linux/386, linux/arm/v6
+          platforms: linux/arm64, linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
