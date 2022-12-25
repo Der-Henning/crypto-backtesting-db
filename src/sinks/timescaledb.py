@@ -1,10 +1,12 @@
+from typing import Union
+import pandas as pd
 import psycopg2
 from pgcopy import CopyManager
 from sources import binanceColumns
 
 
 class TimescaleDB():
-    def __init__(self, host, port, username, password):
+    def __init__(self, host: str, port: Union[str, int], username: str, password: str):
         self.host = host
         self.port = port
         self.username = username
@@ -12,7 +14,7 @@ class TimescaleDB():
         self.connStr = "postgres://{}:{}@{}:{}/".format(
             self.username, self.password, self.host, self.port)
 
-    def createDatabase(self, name, clear=False):
+    def createDatabase(self, name: str, clear: bool = False) -> None:
         try:
             connection = psycopg2.connect(self.connStr,)
             connection.autocommit = True
@@ -24,7 +26,7 @@ class TimescaleDB():
             if connection:
                 connection.close()
 
-    def createTable(self, database, symbol, clear=False):
+    def createTable(self, database: str, symbol: str, clear: bool = False) -> None:
         with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:
             cursor = conn.cursor()
             if clear:
@@ -43,14 +45,14 @@ class TimescaleDB():
             conn.commit()
             cursor.close()
 
-    def write(self, database, symbol, df):
+    def write(self, database: str, symbol: str, df: pd.DataFrame) -> None:
         with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:
             mgr = CopyManager(conn, symbol.lower(), df.columns)
             self.deleteLastTimestamp(database, symbol)
             mgr.copy(df.to_numpy())
             conn.commit()
 
-    def deleteLastTimestamp(self, database, symbol):
+    def deleteLastTimestamp(self, database: str, symbol: str) -> None:
         with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:
             ts = self.getLastTimestamp(database, symbol)
             if ts:
@@ -60,7 +62,7 @@ class TimescaleDB():
                 conn.commit()
                 cursor.close()
 
-    def getLastTimestamp(self, database, symbol):
+    def getLastTimestamp(self, database: str, symbol: str) -> Union[str, None]:
         with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -72,7 +74,7 @@ class TimescaleDB():
             cursor.close()
             return ts
 
-    def getFirstTimestamp(self, database, symbol):
+    def getFirstTimestamp(self, database: str, symbol: str) -> Union[str, None]:
         with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:
             cursor = conn.cursor()
             cursor.execute(

@@ -1,3 +1,4 @@
+from typing import Literal
 from binance import Client
 import numpy as np
 import pandas as pd
@@ -18,12 +19,17 @@ columns = np.array([
 
 
 class Binance():
-    def __init__(self, api_key, api_secret):
+    def __init__(self, api_key: str, api_secret: str):
         self.api_key = api_key
         self.api_secret = api_secret
         self.client = Client(api_key, api_secret)
 
-    def get_klines(self, symbol, startTime, endTime='NOW', interval=Client.KLINE_INTERVAL_1MINUTE):
+    def get_klines(self,
+                   symbol: str,
+                   startTime: str,
+                   endTime: str = 'NOW',
+                   interval: Literal = Client.KLINE_INTERVAL_1MINUTE
+                   ) -> pd.DataFrame:
         klines = self.client.get_historical_klines(
             symbol, interval, startTime, endTime)
         data = np.array(klines)
