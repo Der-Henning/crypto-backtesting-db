@@ -1,7 +1,7 @@
 FROM python:3.9-slim
 
 RUN addgroup --gid 1001 --system crypto && \
-    adduser --shell /bin/false --disabled-password --uid 1001 --system --group tgtg
+    adduser --shell /bin/false --disabled-password --uid 1001 --system --group crypto
 RUN mkdir -p /app
 RUN chown crypto:crypto /app
 
