@@ -1,11 +1,17 @@
-FROM python:3.9
+FROM python:3.9-slim
 
-WORKDIR /usr/src/app
+RUN addgroup --gid 1001 --system crypto && \
+    adduser --shell /bin/false --disabled-password --uid 1001 --system --group tgtg
+RUN mkdir -p /app
+RUN chown crypto:crypto /app
 
-COPY requirements.txt .
+WORKDIR /app
+USER crypto
 
-RUN pip install -r requirements.txt
+COPY --chown=crypto:crypto requirements.txt /tmp/pip-tmp/
+RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
+    && rm -rf /tmp/pip-tmp
 
-COPY ./src .
+COPY --chown=crypto:crypto ./src .
 
-CMD [ "python","-u","runner.py" ]
+CMD [ "python", "-u", "runner.py" ]
