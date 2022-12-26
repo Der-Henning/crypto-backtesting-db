@@ -18,10 +18,13 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      timescaledb:
+      postgres:
         image: timescale/timescaledb:2.9.1-pg14
+        ports:
+          - 5432:5432
         env:
-          POSTGRES_PASSWORD: MyPassword
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_PORT: 5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -43,9 +46,9 @@ jobs:
       - name: Run unit tests
         run: python -m pytest
         env:
-          TEST_TIMESCALE_HOST: timescaledb
+          TEST_TIMESCALE_HOST: postgres
           TEST_TIMESCALE_PORT: 5432
           TEST_TIMESCALE_USERNAME: postgres
-          TEST_TIMESCALE_PASSWORD: MyPassword
+          TEST_TIMESCALE_PASSWORD: postgres
           TEST_DATABASE: binance
           TEST_SYMBOL: BTCUSDT
