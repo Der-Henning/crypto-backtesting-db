@@ -14,7 +14,7 @@ jobs:
   tests:
     strategy:
       matrix:
-        python: ['3.9', '3.10']
+        python: ["3.9", "3.10"]
     runs-on: ubuntu-latest
 
     services:
@@ -44,7 +44,7 @@ jobs:
           pip install -e .
 
       - name: Run unit tests
-        run: python -m pytest --cov src/
+        run: python -m pytest --cov src/ --cov-report=xml
         env:
           TEST_TIMESCALE_HOST: localhost
           TEST_TIMESCALE_PORT: 5432
@@ -52,3 +52,6 @@ jobs:
           TEST_TIMESCALE_PASSWORD: postgres
           TEST_DATABASE: binance
           TEST_SYMBOL: BTCUSDT
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
