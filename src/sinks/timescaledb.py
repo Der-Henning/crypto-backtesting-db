@@ -1,10 +1,12 @@
 from typing import Union
+import logging
 import pandas as pd
 import psycopg2
+from psycopg2.errors import DuplicateDatabase, InvalidCatalogName, UndefinedTable, DatabaseError
 from pgcopy import CopyManager
 from sources import binanceColumns
 
-
+log = logging.getLogger("cryptoDB")
 class TimescaleDB():
     def __init__(self, host: str, port: Union[str, int], username: str, password: str):
         self.host = host
@@ -15,35 +17,58 @@ class TimescaleDB():
             self.username, self.password, self.host, self.port)
 
     def createDatabase(self, name: str, clear: bool = False) -> None:
+        if clear:
+            self.dropDatabase(name)
         try:
-            connection = psycopg2.connect(self.connStr,)
+            connection = psycopg2.connect(self.connStr)
             connection.autocommit = True
             with connection.cursor() as cursor:
-                if clear:
-                    cursor.execute("DROP DATABASE {}".format(name.lower()))
                 cursor.execute("CREATE DATABASE {}".format(name.lower()))
+        except DuplicateDatabase as err:
+            log.debug(err)
+        finally:
+            if connection:
+                connection.close()
+
+    def dropDatabase(self, name: str) -> None:
+        try:
+            connection = psycopg2.connect(self.connStr)
+            connection.autocommit = True
+            with connection.cursor() as cursor:
+                cursor.execute("DROP DATABASE {}".format(name.lower()))
+        except InvalidCatalogName as err:
+            log.debug(err)
         finally:
             if connection:
                 connection.close()
 
     def createTable(self, database: str, symbol: str, clear: bool = False) -> None:
+        if clear:
+            self.dropTable(database, symbol)
         with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:
-            cursor = conn.cursor()
-            if clear:
-                cursor.execute("DROP TABLE {}".format(symbol.lower()))
-            query_create_table = "CREATE TABLE IF NOT EXISTS {} ({})".format(
-                symbol.lower(),
-                (', '.join("{} {}".format(row[0], row[1])
-                 for row in binanceColumns))
-            )
-            query_create_hypertable = "SELECT create_hypertable('{}', '{}')".format(
-                symbol.lower(),
-                binanceColumns[0][0]
-            )
-            cursor.execute(query_create_table)
-            cursor.execute(query_create_hypertable)
-            conn.commit()
-            cursor.close()
+            with conn.cursor() as cursor:
+                try:
+                    query_create_table = "CREATE TABLE IF NOT EXISTS {} ({})".format(
+                        symbol.lower(),
+                        (', '.join("{} {}".format(row[0], row[1])
+                        for row in binanceColumns))
+                    )
+                    query_create_hypertable = "SELECT create_hypertable('{}', '{}')".format(
+                        symbol.lower(),
+                        binanceColumns[0][0]
+                    )
+                    cursor.execute(query_create_table)
+                    cursor.execute(query_create_hypertable)
+                except DatabaseError as err:
+                    log.debug(err)
+
+    def dropTable(self, database: str, symbol: str) -> None:
+        with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:
+            with conn.cursor() as cursor:
+                try:
+                    cursor.execute("DROP TABLE {}".format(symbol.lower()))
+                except UndefinedTable as err:
+                    log.debug(err)
 
     def write(self, database: str, symbol: str, df: pd.DataFrame) -> None:
         with psycopg2.connect("{}{}".format(self.connStr, database.lower())) as conn:

@@ -19,7 +19,7 @@ columns = np.array([
 
 
 class Binance():
-    def __init__(self, api_key: str, api_secret: str):
+    def __init__(self, api_key: str = None, api_secret: str = None):
         self.api_key = api_key
         self.api_secret = api_secret
         self.client = Client(api_key, api_secret)
