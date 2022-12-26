@@ -16,7 +16,6 @@ jobs:
       matrix:
         python: ['3.9', '3.10']
     runs-on: ubuntu-latest
-    container: node:10.18-jessie
 
     services:
       postgres:
@@ -47,7 +46,7 @@ jobs:
       - name: Run unit tests
         run: python -m pytest
         env:
-          TEST_TIMESCALE_HOST: postgres
+          TEST_TIMESCALE_HOST: localhost
           TEST_TIMESCALE_PORT: 5432
           TEST_TIMESCALE_USERNAME: postgres
           TEST_TIMESCALE_PASSWORD: postgres
