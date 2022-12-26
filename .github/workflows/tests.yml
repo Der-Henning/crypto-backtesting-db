@@ -16,6 +16,7 @@ jobs:
       matrix:
         python: ['3.9', '3.10']
     runs-on: ubuntu-latest
+    container: node:10.18-jessie
 
     services:
       postgres:
