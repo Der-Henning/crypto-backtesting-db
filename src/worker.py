@@ -10,7 +10,7 @@ class Worker():
         self.logger = logging.getLogger("cryptodb")
 
     def run(self):
-        for symbol in self.config['symbols']:
+        for symbol in self.config.symbols:
             self.logger.info("Current Symbol: {}".format(symbol))
             try:
                 self.config.timescaledb.createTable(
@@ -19,7 +19,7 @@ class Worker():
                 # psycopg2.DatabaseError: table "btcusdt" is already a hypertable
                 pass
 
-            start_time = self.config['start_time']
+            start_time = self.config.start_time
             start_timestamp = helpers.convert_ts_str(start_time) / 1000
             first_time = self.config.timescaledb.getFirstTimestamp(
                 self.config.database, symbol)

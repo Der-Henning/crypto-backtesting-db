@@ -13,7 +13,7 @@ def main() -> NoReturn:
 
     logging.basicConfig(
         format='%(asctime)s %(levelname)-8s %(message)s',
-        level=logging.DEBUG if config['debug'] else logging.INFO,
+        level=logging.DEBUG if config.debug else logging.INFO,
         datefmt='%Y-%m-%d %H:%M:%S',
         handlers=[
             logging.StreamHandler()
@@ -35,7 +35,7 @@ def main() -> NoReturn:
         except:
             logger.error("Job Error! - {0}".format(sys.exc_info()))
         finally:
-            sleep(config['sleep_time'])
+            sleep(config.sleep_time)
 
 
 if __name__ == "__main__":

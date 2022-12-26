@@ -5,3 +5,5 @@ __pycache__
 .venv
 .vscode
 .coverage
+coverage.xml
+.DS_Store
