@@ -19,6 +19,7 @@ class TimescaleDB():
     def createDatabase(self, name: str, clear: bool = False) -> None:
         if clear:
             self.dropDatabase(name)
+        connection = None
         try:
             connection = psycopg2.connect(self.connStr)
             connection.autocommit = True
@@ -31,6 +32,7 @@ class TimescaleDB():
                 connection.close()
 
     def dropDatabase(self, name: str) -> None:
+        connection = None
         try:
             connection = psycopg2.connect(self.connStr)
             connection.autocommit = True
