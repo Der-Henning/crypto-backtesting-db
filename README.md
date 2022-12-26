@@ -1,3 +1,7 @@
+[![Publish multi-arch Docker images](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/docker-multi-arch.yml/badge.svg)](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/docker-multi-arch.yml)
+[![Tests](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/tests.yml/badge.svg)](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/tests.yml)
+[![Publish multi-arch Docker images](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/docker-multi-arch.yml/badge.svg)](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/docker-multi-arch.yml)
+
 # Crypto Backtesting Database
 
 TimescaleDB to store historical crypto data from binance.com locally to generate data for backtesting fast.
