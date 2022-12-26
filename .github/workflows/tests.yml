@@ -44,7 +44,7 @@ jobs:
           pip install -e .
 
       - name: Run unit tests
-        run: python -m pytest
+        run: python -m pytest --cov src/
         env:
           TEST_TIMESCALE_HOST: localhost
           TEST_TIMESCALE_PORT: 5432
