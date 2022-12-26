@@ -11,10 +11,10 @@ on:
       - dev
 
 jobs:
-  build:
+  tests:
     strategy:
       matrix:
-        python-version: ['3.9', '3.10']
+        python: ['3.9', '3.10']
     runs-on: ubuntu-latest
 
     services:

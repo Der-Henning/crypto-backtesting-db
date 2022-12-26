@@ -1,7 +1,7 @@
 from sources.binance import Binance, columns
-from datetime import datetime, timedelta
 import pandas as pd
 import pytest
+import pickle
 
 
 @pytest.fixture
@@ -9,8 +9,14 @@ def binance() -> Binance:
     return Binance()
 
 
-def test_get_klines(binance):
-    data = binance.get_klines('BTCUSDT', str(
-        (datetime.now() - timedelta(hours=1)).date()))
-    assert isinstance(data, pd.DataFrame)
-    assert any(col in data.columns for col in columns[:, 0])
+@pytest.fixture
+def test_data():
+    with open('tests/test_data.pkl', 'rb') as file:
+        data = pickle.load(file)
+    return data
+
+
+def test_make_dataframe(binance: Binance, test_data: list):
+    df = binance.make_dataframe(test_data)
+    assert isinstance(df, pd.DataFrame)
+    assert any(col in df.columns for col in columns[:, 0])

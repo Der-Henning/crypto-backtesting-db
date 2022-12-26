@@ -26,7 +26,7 @@ def symbol():
 
 @pytest.fixture
 def test_data():
-    return pd.read_pickle('tests/test_data.pkl')
+    return pd.read_pickle('tests/test_dataframe.pkl')
 
 
 def test_database(timescaleDB: TimescaleDB, database: str, symbol: str, test_data: pd.DataFrame):
