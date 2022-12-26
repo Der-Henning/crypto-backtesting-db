@@ -14,8 +14,19 @@ jobs:
   build:
     strategy:
       matrix:
-        python-version: [3.9, 3.10]
+        python-version: ['3.9', '3.10']
     runs-on: ubuntu-latest
+
+    services:
+      timescaledb:
+        image: timescale/timescaledb:2.9.1-pg14
+        env:
+          POSTGRES_PASSWORD: MyPassword
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v3
@@ -31,3 +42,10 @@ jobs:
 
       - name: Run unit tests
         run: python -m pytest
+        env:
+          TEST_TIMESCALE_HOST: timescaledb
+          TEST_TIMESCALE_PORT: 5432
+          TEST_TIMESCALE_USERNAME: postgres
+          TEST_TIMESCALE_PASSWORD: MyPassword
+          TEST_DATABASE: binance
+          TEST_SYMBOL: BTCUSDT
