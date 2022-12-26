@@ -22,7 +22,10 @@ class Binance():
     def __init__(self, api_key: str = None, api_secret: str = None):
         self.api_key = api_key
         self.api_secret = api_secret
-        self.client = Client(api_key, api_secret)
+
+    @property
+    def client(self):
+        return Client(self.api_key, self.api_secret)
 
     def get_klines(self,
                    symbol: str,

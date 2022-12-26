@@ -6,8 +6,6 @@ import pickle
 
 @pytest.fixture
 def binance() -> Binance:
-    # Disable API connection to binance.com
-    Binance.__init__ = lambda *args, **kwargs: None
     return Binance()
 
 
