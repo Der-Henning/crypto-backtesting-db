@@ -1,5 +1,6 @@
 [![Publish multi-arch Docker images](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/docker-multi-arch.yml/badge.svg)](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/docker-multi-arch.yml)
 [![Tests](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/tests.yml/badge.svg)](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/Der-Henning/crypto-backtesting-db/branch/main/graph/badge.svg?token=HER7F4P7HI)](https://codecov.io/gh/Der-Henning/crypto-backtesting-db)
 [![Publish multi-arch Docker images](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/docker-multi-arch.yml/badge.svg)](https://github.com/Der-Henning/crypto-backtesting-db/actions/workflows/docker-multi-arch.yml)
 
 # Crypto Backtesting Database
