@@ -19,7 +19,7 @@ columns = np.array([
 
 
 class Binance():
-    def __init__(self, api_key: str, api_secret: str):
+    def __init__(self, api_key: str = None, api_secret: str = None):
         self.api_key = api_key
         self.api_secret = api_secret
         self.client = Client(api_key, api_secret)
@@ -32,7 +32,11 @@ class Binance():
                    ) -> pd.DataFrame:
         klines = self.client.get_historical_klines(
             symbol, interval, startTime, endTime)
-        data = np.array(klines)
+        df = self.make_dataframe(klines)
+        return df
+
+    def make_dataframe(self, raw: list) -> pd.DataFrame:
+        data = np.array(raw)
         df = pd.DataFrame({
             'time': pd.to_datetime(data[:, 0], unit='ms'),
             'open': pd.to_numeric(data[:, 1]),
