@@ -6,18 +6,23 @@ import logging
 import sys
 from time import sleep
 from worker import Worker
+from http.client import HTTPConnection
 
 
 def main() -> NoReturn:
     config = Config()
 
-    logging.basicConfig(
-        format='%(asctime)s %(levelname)-8s %(message)s',
-        level=logging.DEBUG if config.debug else logging.INFO,
-        datefmt='%Y-%m-%d %H:%M:%S',
-        handlers=[
-            logging.StreamHandler()
-        ])
+    HTTPConnection.debuglevel = 0
+    for handler in logging.root.handlers:
+        logging.root.removeHandler(handler)
+    logging.root.setLevel(logging.DEBUG if config.debug else logging.INFO)
+    stream_handler = logging.StreamHandler()
+    stream_formatter = logging.Formatter(
+        fmt='%(asctime)s %(levelname)-8s %(message)s'
+    )
+    stream_handler.setFormatter(stream_formatter)
+    logging.root.addHandler(stream_handler)
+
     logger = logging.getLogger('cryptodb')
 
     try:
