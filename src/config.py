@@ -10,6 +10,7 @@ class Config():
             "DEBUG", "").lower() in ('true', '1', 't') else False
         self.symbols: list[str] = json.loads(environ.get("SYMBOLS", "[]"))
         self.start_time: str = environ.get("START_DATE", "")
+        self.end_time: str = environ.get("END_DATE", "NOW")
         self.sleep_time: int = int(environ.get("SLEEP_TIME", 60))
         self.timescaledb: TimescaleDB = TimescaleDB(
             host=environ.get("TIMESCALE_HOST", "localhost"),

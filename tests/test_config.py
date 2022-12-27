@@ -10,6 +10,7 @@ def environment() -> dict:
         "DEBUG": "true",
         "SYMBOLS": '["BTCUSDT","ETHUSDT"]',
         "START_DATE": "01.01.2021",
+        "END_DATE": "01.02.2021",
         "SLEEP_TIME": "30",
         "TIMESCALE_HOST": "postgres",
         "TIMESCALE_PORT": "1234",
@@ -26,6 +27,7 @@ def assert_config():
         "debug": True,
         "symbols": ["BTCUSDT", "ETHUSDT"],
         "start_time": "01.01.2021",
+        "end_time": "01.02.2021",
         "sleep_time": 30,
         "timescaledb": TimescaleDB(
             host="postgres",

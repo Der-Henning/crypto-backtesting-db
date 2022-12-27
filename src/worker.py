@@ -26,7 +26,7 @@ class Worker():
 
             if start_timestamp and first_time and start_timestamp < datetime.timestamp(first_time):
                 self.logger.warning(
-                    "Start time befor first timestamp in database")
+                    "Start time before first timestamp in database")
                 self.logger.warning(
                     "Recreating table {}".format(symbol.lower()))
                 self.config.timescaledb.createTable(
@@ -37,7 +37,7 @@ class Worker():
             if last_time:
                 start_time = str(last_time)
             klines_df = self.config.binance.get_klines(
-                symbol, startTime=start_time)
+                symbol, startTime=start_time, endTime=self.config.end_time)
             self.logger.debug(klines_df)
             self.config.timescaledb.write(
                 self.config.database, symbol, klines_df)
