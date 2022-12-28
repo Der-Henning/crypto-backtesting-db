@@ -1,0 +1,24 @@
+version: "3.3"
+services:
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: cryptodb
+    environment:
+      - TEST_TIMESCALE_HOST=db
+      - TEST_TIMESCALE_PORT=5432
+      - TEST_TIMESCALE_USERNAME=postgres
+      - TEST_TIMESCALE_PASSWORD=postgres
+      - TEST_SYMBOL=BTCUSDT
+      - TEST_DATABASE=binance
+    command:
+      /bin/sh -c "while sleep 1000; do :; done"
+    volumes:
+      - .:/workspace:cached
+    restart: unless-stopped
+
+  db:
+    image: timescale/timescaledb:2.9.1-pg14
+    environment:
+      - POSTGRES_PASSWORD=postgres

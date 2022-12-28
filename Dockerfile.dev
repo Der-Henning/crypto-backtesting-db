@@ -1,0 +1,18 @@
+FROM python:3.9
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        gcc \
+        python3-dev \
+        libpq-dev \
+        git \
+        gnupg2 \
+        make
+
+WORKDIR /workspace
+
+COPY requirements.txt /tmp/pip-tmp/
+COPY requirements-dev.txt /tmp/pip-tmp/
+RUN python -m pip install --no-cache-dir --upgrade pip && \
+    python -m pip install --no-cache-dir -r /tmp/pip-tmp/requirements-dev.txt && \
+    rm -rf /tmp/pip-tmp
