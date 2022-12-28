@@ -1,20 +1,40 @@
+FROM python:3.9 AS builder
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        gcc \
+        python3-dev \
+        libpq-dev
+
+COPY requirements.txt /tmp/pip-tmp/
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN python -m pip install --no-cache-dir --upgrade pip && \
+    python -m pip install --no-cache-dir -r /tmp/pip-tmp/requirements.txt
+
 FROM python:3.9-slim
 
-RUN apt-get update \
-    && apt-get install gcc python3-dev libpq-dev -y \
-    && apt-get clean
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libpq-dev && \
+    apt-get clean && \
+        rm -rf \
+        /tmp/* \
+        /var/lib/apt/lists/* \
+        /var/tmp/*
 
 RUN addgroup --gid 1001 --system crypto && \
     adduser --shell /bin/false --disabled-password --uid 1001 --system --group crypto
 RUN mkdir -p /app
 RUN chown crypto:crypto /app
 
-WORKDIR /app
 USER crypto
 
-COPY --chown=crypto:crypto requirements.txt /tmp/pip-tmp/
-RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
-    && rm -rf /tmp/pip-tmp
+WORKDIR /app
+
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY --from=builder /opt/venv /opt/venv
 
 COPY --chown=crypto:crypto ./src .
 
