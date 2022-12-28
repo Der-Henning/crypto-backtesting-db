@@ -14,6 +14,15 @@ RUN python -m pip install --no-cache-dir --upgrade pip && \
 
 FROM python:3.9-slim
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libpq-dev && \
+    apt-get clean && \
+        rm -rf \
+        /tmp/* \
+        /var/lib/apt/lists/* \
+        /var/tmp/*
+
 RUN addgroup --gid 1001 --system crypto && \
     adduser --shell /bin/false --disabled-password --uid 1001 --system --group crypto
 RUN mkdir -p /app
