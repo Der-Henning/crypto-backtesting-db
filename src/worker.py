@@ -1,7 +1,9 @@
-from config import Config
 import logging
-from binance import helpers
 from datetime import datetime
+
+from binance import helpers
+
+from config import Config
 
 
 class Worker():

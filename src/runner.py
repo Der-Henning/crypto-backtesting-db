@@ -1,12 +1,13 @@
-from typing import NoReturn
-from os import environ
-from config import Config
-from psycopg2.errors import DuplicateDatabase
 import logging
 import sys
-from time import sleep
-from worker import Worker
 from http.client import HTTPConnection
+from time import sleep
+from typing import NoReturn
+
+from psycopg2.errors import DuplicateDatabase
+
+from config import Config
+from worker import Worker
 
 
 def main() -> NoReturn:

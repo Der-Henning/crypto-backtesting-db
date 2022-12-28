@@ -1,5 +1,6 @@
-from os import environ
 import json
+from os import environ
+
 from sinks import TimescaleDB
 from sources import Binance
 

@@ -1,9 +1,12 @@
-from typing import Union
 import logging
+from typing import Union
+
 import pandas as pd
 import psycopg2
-from psycopg2.errors import DuplicateDatabase, InvalidCatalogName, UndefinedTable, DatabaseError
 from pgcopy import CopyManager
+from psycopg2.errors import (DatabaseError, DuplicateDatabase,
+                             InvalidCatalogName, UndefinedTable)
+
 from sources import binanceColumns
 
 

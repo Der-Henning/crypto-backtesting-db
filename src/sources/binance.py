@@ -1,7 +1,8 @@
 from typing import Literal
-from binance import Client
+
 import numpy as np
 import pandas as pd
+from binance import Client
 
 columns = np.array([
     ('time', 'TIMESTAMPTZ PRIMARY KEY'),
