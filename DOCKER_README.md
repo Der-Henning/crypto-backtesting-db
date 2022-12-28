@@ -8,7 +8,7 @@ Readme, source and documentation on [https://github.com/Der-Henning/crypto-backt
  The `edge` images contain the latest commits to the main branch.
 
 - [`edge`](https://github.com/Der-Henning/crypto-backtesting-db/blob/main/Dockerfile)
-- [`v0.1`, `v0.1.2`, `latest`](https://github.com/Der-Henning/crypto-backtesting-db/blob/v0.1.2/Dockerfile)
+- [`v0.1`, `v0.1.3`, `latest`](https://github.com/Der-Henning/crypto-backtesting-db/blob/v0.1.2/Dockerfile)
 
 # Quick Start
 
