@@ -1,5 +1,5 @@
 numpy==1.24.0
-pandas==1.5.2
+pandas==1.5.3
 pgcopy==1.5.0
 psycopg2==2.9.5
 python-binance==1.0.16
