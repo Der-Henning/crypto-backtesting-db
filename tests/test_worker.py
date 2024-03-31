@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
-from worker import Worker
+
 from config import Config
+from worker import Worker
 
 
 def test_worker(config: Config, responses, binance_ping_response, binance_get_klines_response):

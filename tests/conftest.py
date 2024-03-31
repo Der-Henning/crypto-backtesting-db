@@ -1,12 +1,14 @@
+import json
+import pickle
+from os import environ
+
+import pandas as pd
 import pytest
 import requests
-import json
-from os import environ
-import pickle
-import pandas as pd
-from sources import Binance
-from sinks import TimescaleDB
+
 from config import Config
+from sinks import TimescaleDB
+from sources import Binance
 
 
 @pytest.fixture(scope='function')

@@ -18,22 +18,14 @@
 	"workspaceFolder": "/workspace",
 
 	// Set *default* container specific settings.json values on container create.
-	"settings": { 
-		"python.defaultInterpreterPath": "/usr/local/bin/python",
-		"python.testing.pytestEnabled": true,
-		"python.testing.pytestArgs": ["tests"],
-		"python.linting.enabled": true,
-		"python.linting.flake8Enabled": true,
-		"python.linting.flake8Args": ["--max-line-length=100"],
-		"python.formatting.provider": "autopep8",
-		"python.formatting.autopep8Args": ["--in-place", "--max-line-length=100"]
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"njpwerner.autodocstring"
+			]
+		}
 	},
-
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"ms-python.python",
-		"njpwerner.autodocstring"
-	],
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},

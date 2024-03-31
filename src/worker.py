@@ -1,7 +1,7 @@
 import logging
-from datetime import datetime
+# from datetime import datetime
 
-from binance import helpers
+# from binance import helpers
 
 from config import Config
 
@@ -22,17 +22,17 @@ class Worker():
                 pass
 
             start_time = self.config.start_time
-            start_timestamp = helpers.convert_ts_str(start_time) / 1000
-            first_time = self.config.timescaledb.getFirstTimestamp(
-                self.config.database, symbol)
+            # start_timestamp = helpers.convert_ts_str(start_time) / 1000
+            # first_time = self.config.timescaledb.getFirstTimestamp(
+            #     self.config.database, symbol)
 
-            if start_timestamp and first_time and start_timestamp < datetime.timestamp(first_time):
-                self.logger.warning(
-                    "Start time before first timestamp in database")
-                self.logger.warning(
-                    "Recreating table {}".format(symbol.lower()))
-                self.config.timescaledb.createTable(
-                    self.config.database, symbol, True)
+            # if start_timestamp and first_time and start_timestamp < datetime.timestamp(first_time):
+            #     self.logger.warning(
+            #         "Start time before first timestamp in database")
+            #     self.logger.warning(
+            #         "Recreating table {}".format(symbol.lower()))
+            #     self.config.timescaledb.createTable(
+            #         self.config.database, symbol, True)
 
             last_time = self.config.timescaledb.getLastTimestamp(
                 self.config.database, symbol)

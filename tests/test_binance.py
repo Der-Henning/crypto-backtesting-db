@@ -1,5 +1,6 @@
-from sources.binance import Binance, columns
 import pandas as pd
+
+from sources.binance import Binance, columns
 
 
 def test_make_dataframe(binance: Binance, test_data: list):

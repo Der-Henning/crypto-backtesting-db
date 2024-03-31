@@ -1,4 +1,5 @@
 import pytest
+
 from config import Config
 from sinks import TimescaleDB
 from sources import Binance
