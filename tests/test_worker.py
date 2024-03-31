@@ -25,7 +25,7 @@ def test_worker(config: Config, responses, binance_ping_response, binance_get_kl
     worker = Worker(config)
     worker.run()
 
-    assert len(responses.calls) == 10
+    assert len(responses.calls) == 8
     assert config.timescaledb.getFirstTimestamp(
         config.database, config.symbols[0]) == datetime(2022, 12, 24, tzinfo=timezone.utc)
     assert config.timescaledb.getLastTimestamp(
