@@ -1,7 +1,7 @@
 use crate::binance::KlineDataVec;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
 use sqlx::types::chrono::{DateTime, Utc};
-use sqlx::{Error, PgPool};
+use sqlx::{Error, PgPool, Postgres, QueryBuilder};
 
 #[derive(Debug, Clone)]
 pub struct PgConnector {
@@ -91,54 +91,71 @@ impl PgConnector {
     }
 
     pub async fn insert(&self, symbol: &str, klines: KlineDataVec) -> Result<u64, Error> {
-        const SQL: &str = r#"
-            INSERT INTO market (
-                symbol, time, open, high, low, close, volume, close_time,
-                quote_asset_volume, number_of_trades, taker_buy_base_asset_volume,
-                taker_buy_quote_asset_volume
-            )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-            ON CONFLICT (symbol, time) DO UPDATE SET
-                open = EXCLUDED.open,
-                high = EXCLUDED.high,
-                low = EXCLUDED.low,
-                close = EXCLUDED.close,
-                volume = EXCLUDED.volume,
-                close_time = EXCLUDED.close_time,
-                quote_asset_volume = EXCLUDED.quote_asset_volume,
-                number_of_trades = EXCLUDED.number_of_trades,
-                taker_buy_base_asset_volume = EXCLUDED.taker_buy_base_asset_volume,
-                taker_buy_quote_asset_volume = EXCLUDED.taker_buy_quote_asset_volume
-        "#;
+        let rows = klines
+            .0
+            .into_iter()
+            .map(|row| {
+                let time = DateTime::from_timestamp_millis(row.time)
+                    .ok_or_else(|| Error::Protocol("invalid Binance open timestamp".into()))?;
+                let close_time = DateTime::from_timestamp_millis(row.close_time)
+                    .ok_or_else(|| Error::Protocol("invalid Binance close timestamp".into()))?;
 
-        let mut transaction = self.pool.begin().await?;
-        let mut affected_rows = 0;
+                Ok((
+                    time,
+                    row.open,
+                    row.high,
+                    row.low,
+                    row.close,
+                    row.volume,
+                    close_time,
+                    row.quote_asset_volume,
+                    row.number_of_trades,
+                    row.taker_buy_base_asset_volume,
+                    row.taker_buy_quote_asset_volume,
+                ))
+            })
+            .collect::<Result<Vec<_>, Error>>()?;
 
-        for row in klines.0 {
-            let time = DateTime::from_timestamp_millis(row.time)
-                .ok_or_else(|| Error::Protocol("invalid Binance open timestamp".into()))?;
-            let close_time = DateTime::from_timestamp_millis(row.close_time)
-                .ok_or_else(|| Error::Protocol("invalid Binance close timestamp".into()))?;
-
-            affected_rows += sqlx::query(SQL)
-                .bind(symbol)
-                .bind(time)
-                .bind(row.open)
-                .bind(row.high)
-                .bind(row.low)
-                .bind(row.close)
-                .bind(row.volume)
-                .bind(close_time)
-                .bind(row.quote_asset_volume)
-                .bind(row.number_of_trades)
-                .bind(row.taker_buy_base_asset_volume)
-                .bind(row.taker_buy_quote_asset_volume)
-                .execute(&mut *transaction)
-                .await?
-                .rows_affected();
+        if rows.is_empty() {
+            return Ok(0);
         }
 
-        transaction.commit().await?;
-        Ok(affected_rows)
+        let mut query = QueryBuilder::<Postgres>::new(
+            "INSERT INTO market (\
+                symbol, time, open, high, low, close, volume, close_time, \
+                quote_asset_volume, number_of_trades, taker_buy_base_asset_volume, \
+                taker_buy_quote_asset_volume\
+            ) ",
+        );
+        query.push_values(rows, |mut values, row| {
+            values
+                .push_bind(symbol)
+                .push_bind(row.0)
+                .push_bind(row.1)
+                .push_bind(row.2)
+                .push_bind(row.3)
+                .push_bind(row.4)
+                .push_bind(row.5)
+                .push_bind(row.6)
+                .push_bind(row.7)
+                .push_bind(row.8)
+                .push_bind(row.9)
+                .push_bind(row.10);
+        });
+        query.push(
+            " ON CONFLICT (symbol, time) DO UPDATE SET \
+                open = EXCLUDED.open, \
+                high = EXCLUDED.high, \
+                low = EXCLUDED.low, \
+                close = EXCLUDED.close, \
+                volume = EXCLUDED.volume, \
+                close_time = EXCLUDED.close_time, \
+                quote_asset_volume = EXCLUDED.quote_asset_volume, \
+                number_of_trades = EXCLUDED.number_of_trades, \
+                taker_buy_base_asset_volume = EXCLUDED.taker_buy_base_asset_volume, \
+                taker_buy_quote_asset_volume = EXCLUDED.taker_buy_quote_asset_volume",
+        );
+
+        Ok(query.build().execute(&self.pool).await?.rows_affected())
     }
 }
