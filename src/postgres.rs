@@ -2,6 +2,7 @@ use crate::binance::KlineDataVec;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
 use sqlx::types::chrono::{DateTime, Utc};
 use sqlx::{Error, PgPool, Postgres, QueryBuilder};
+use std::time::Duration;
 
 #[derive(Debug, Clone)]
 pub struct PgConnector {
@@ -25,6 +26,7 @@ impl PgConnector {
             .database(dbname);
         let pool = PgPoolOptions::new()
             .max_connections(max_connections)
+            .acquire_slow_threshold(Duration::from_secs(10))
             .connect_with(opts)
             .await?;
         Ok(Self { pool })
