@@ -24,14 +24,31 @@ struct Args {
     interval: KlinesIntervalEnum,
     #[arg(short('H'), long, env = "TIMESCALE_HOST", default_value = "127.0.0.1")]
     db_host: String,
-    #[arg(short('u'), long, env = "TIMESCALE_PORT")]
+    #[arg(short('u'), long, env = "TIMESCALE_PORT", default_value_t = 5432)]
     db_port: u16,
-    #[arg(short('P'), long, env = "TIMESCALE_USERNAME")]
+    #[arg(
+        short('P'),
+        long,
+        env = "TIMESCALE_USERNAME",
+        default_value = "postgres"
+    )]
     db_username: String,
-    #[arg(short('p'), long, env = "TIMESCALE_PASSWORD")]
+    #[arg(
+        short('p'),
+        long,
+        env = "TIMESCALE_PASSWORD",
+        default_value = "postgres"
+    )]
     db_password: String,
-    #[arg(short('d'), long, env = "TIMESCALE_DBNAME")]
+    #[arg(short('d'), long, env = "TIMESCALE_DBNAME", default_value = "postgres")]
     db_name: String,
+    #[arg(
+        short('c'),
+        long,
+        env = "TIMESCALE_MAX_CONNECTIONS",
+        default_value_t = 5
+    )]
+    db_connections: u32,
     #[arg(env = "BINANCE_API_KEY")]
     api_key: String,
     #[arg(env = "BINANCE_API_SECRET")]
@@ -61,6 +78,7 @@ async fn main() -> Result<()> {
         &args.db_username,
         &args.db_password,
         &args.db_name,
+        args.db_connections,
     )
     .await?;
     db.create_market_table().await?;

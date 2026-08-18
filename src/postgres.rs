@@ -15,6 +15,7 @@ impl PgConnector {
         user: &str,
         password: &str,
         dbname: &str,
+        max_connections: u32,
     ) -> Result<Self, Error> {
         let opts = PgConnectOptions::new()
             .host(host)
@@ -23,7 +24,7 @@ impl PgConnector {
             .password(password)
             .database(dbname);
         let pool = PgPoolOptions::new()
-            .max_connections(5)
+            .max_connections(max_connections)
             .connect_with(opts)
             .await?;
         Ok(Self { pool })
