@@ -7,6 +7,15 @@ on:
     branches: ["main", "dev"]
 
 jobs:
+  rust-tests:
+    name: Rust unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run Rust unit tests
+        run: cargo test --locked
+
   tests:
     strategy:
       matrix:
@@ -28,8 +37,8 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
 
@@ -49,4 +58,4 @@ jobs:
           TEST_DATABASE: binance
           TEST_SYMBOL: BTCUSDT
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v5

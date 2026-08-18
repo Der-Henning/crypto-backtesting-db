@@ -87,6 +87,94 @@ impl TryFrom<Vec<Vec<KlinesItemInner>>> for KlineDataVec {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn valid_kline(time: i64, close_time: i64) -> Vec<KlinesItemInner> {
+        vec![
+            KlinesItemInner::Integer(time),
+            KlinesItemInner::String("100.12345678".to_owned()),
+            KlinesItemInner::String("101.12345678".to_owned()),
+            KlinesItemInner::String("99.12345678".to_owned()),
+            KlinesItemInner::String("100.98765432".to_owned()),
+            KlinesItemInner::String("42.50000000".to_owned()),
+            KlinesItemInner::Integer(close_time),
+            KlinesItemInner::String("4250.12345678".to_owned()),
+            KlinesItemInner::Integer(1234),
+            KlinesItemInner::String("21.25000000".to_owned()),
+            KlinesItemInner::String("2125.12345678".to_owned()),
+            KlinesItemInner::String("ignored field".to_owned()),
+        ]
+    }
+
+    #[test]
+    fn parses_a_valid_binance_kline() {
+        let kline = KlineData::try_from(valid_kline(1_700_000_000_000, 1_700_000_059_999))
+            .expect("valid Binance kline should parse");
+
+        assert_eq!(kline.time, 1_700_000_000_000);
+        assert_eq!(kline.open, Decimal::from_str("100.12345678").unwrap());
+        assert_eq!(kline.high, Decimal::from_str("101.12345678").unwrap());
+        assert_eq!(kline.low, Decimal::from_str("99.12345678").unwrap());
+        assert_eq!(kline.close, Decimal::from_str("100.98765432").unwrap());
+        assert_eq!(kline.volume, Decimal::from_str("42.50000000").unwrap());
+        assert_eq!(kline.close_time, 1_700_000_059_999);
+        assert_eq!(
+            kline.quote_asset_volume,
+            Decimal::from_str("4250.12345678").unwrap()
+        );
+        assert_eq!(kline.number_of_trades, 1234);
+        assert_eq!(
+            kline.taker_buy_base_asset_volume,
+            Decimal::from_str("21.25000000").unwrap()
+        );
+        assert_eq!(
+            kline.taker_buy_quote_asset_volume,
+            Decimal::from_str("2125.12345678").unwrap()
+        );
+    }
+
+    #[test]
+    fn rejects_a_kline_with_too_few_fields() {
+        let error = KlineData::try_from(valid_kline(1, 2)[..10].to_vec())
+            .expect_err("short Binance kline must be rejected");
+
+        assert_eq!(error.to_string(), "Invalid klines vec");
+    }
+
+    #[test]
+    fn rejects_incorrect_field_types() {
+        let mut kline = valid_kline(1, 2);
+        kline[1] = KlinesItemInner::Integer(100);
+
+        let error = KlineData::try_from(kline).expect_err("numeric open price must be a string");
+
+        assert_eq!(error.to_string(), "Invalid type for decimal field");
+    }
+
+    #[test]
+    fn rejects_invalid_decimal_values() {
+        let mut kline = valid_kline(1, 2);
+        kline[4] = KlinesItemInner::String("not-a-decimal".to_owned());
+
+        assert!(KlineData::try_from(kline).is_err());
+    }
+
+    #[test]
+    fn converts_batches_in_order_and_rejects_invalid_rows() {
+        let batch = KlineDataVec::try_from(vec![valid_kline(1, 2), valid_kline(3, 4)])
+            .expect("valid Binance kline batch should parse");
+        assert_eq!(batch.0.len(), 2);
+        assert_eq!(batch.0[0].time, 1);
+        assert_eq!(batch.0[1].time, 3);
+
+        let mut invalid_kline = valid_kline(5, 6);
+        invalid_kline[8] = KlinesItemInner::String("1234".to_owned());
+        assert!(KlineDataVec::try_from(vec![valid_kline(1, 2), invalid_kline]).is_err());
+    }
+}
+
 #[derive(Debug)]
 pub struct TradeData {
     pub time: u64,

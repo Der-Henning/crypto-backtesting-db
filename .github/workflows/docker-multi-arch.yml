@@ -1,4 +1,4 @@
-name: Publish multi-arch Docker images
+name: Publish Docker images
 
 on:
   push:
@@ -10,8 +10,8 @@ jobs:
     name: Build Docker Images
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: docker/metadata-action@v4
+      - uses: actions/checkout@v4
+      - uses: docker/metadata-action@v5
         id: meta
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/crypto-db
@@ -22,21 +22,20 @@ jobs:
             type=edge,branch=main,suffix=${{ matrix.tag }}
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
-      - uses: docker/login-action@v2
+      - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
-      - uses: docker/build-push-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile
-          platforms: linux/arm64, linux/amd64
+          platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-      - uses: docker/metadata-action@v4
+      - uses: docker/metadata-action@v5
         id: meta-rust
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/crypto-db
@@ -47,15 +46,15 @@ jobs:
             type=edge,branch=main
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile_rust
-          platforms: linux/arm64,linux/amd64
+          platforms: linux/amd64
           push: true
           tags: ${{ steps.meta-rust.outputs.tags }}
           labels: ${{ steps.meta-rust.outputs.labels }}
-      - uses: peter-evans/dockerhub-description@v3
+      - uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
