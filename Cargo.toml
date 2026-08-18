@@ -1,0 +1,17 @@
+[package]
+name = "crypto-db"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1"
+async-stream = "0.3"
+binance-sdk = { version = "68", features = ["spot"] }
+clap = { version = "4", features = ["derive", "env"] }
+dotenvy = "0.15"
+env_logger = "0.11"
+futures-core = "0.3"
+futures-util = "0.3"
+log = "0.4"
+sqlx = { version = "0.9", features = [ "postgres", "runtime-tokio", "chrono", "rust_decimal" ] }
+tokio = { version = "1", features = [ "rt", "macros", "rt-multi-thread" ] }

@@ -1,0 +1,12 @@
+.git
+.gitignore
+.env
+.venv
+.pytest_cache
+.ipynb_checkpoints
+.vscode
+target
+__pycache__
+*.pyc
+.coverage
+coverage.xml

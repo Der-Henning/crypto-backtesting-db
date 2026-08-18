@@ -5,10 +5,9 @@ from sinks import TimescaleDB
 from sources import Binance
 
 
-class Config():
+class Config:
     def __init__(self):
-        self.debug: bool = True if environ.get(
-            "DEBUG", "").lower() in ('true', '1', 't') else False
+        self.debug: bool = environ.get("DEBUG", "").lower() in ('true', '1', 't')
         self.symbols: list[str] = json.loads(environ.get("SYMBOLS", "[]"))
         self.start_time: str = environ.get("START_DATE", "")
         self.end_time: str = environ.get("END_DATE", "NOW")

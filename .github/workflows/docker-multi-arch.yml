@@ -36,6 +36,25 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - uses: docker/metadata-action@v4
+        id: meta-rust
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/crypto-db
+          flavor: |
+            prefix=rust-,onlatest=true
+          tags: |
+            type=edge,branch=dev,suffix=-dev
+            type=edge,branch=main
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile_rust
+          platforms: linux/arm64,linux/amd64
+          push: true
+          tags: ${{ steps.meta-rust.outputs.tags }}
+          labels: ${{ steps.meta-rust.outputs.labels }}
       - uses: peter-evans/dockerhub-description@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
