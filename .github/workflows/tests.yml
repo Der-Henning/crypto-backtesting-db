@@ -7,55 +7,11 @@ on:
     branches: ["main", "dev"]
 
 jobs:
-  rust-tests:
-    name: Rust unit tests
+  tests:
+    name: Unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Run Rust unit tests
         run: cargo test --locked
-
-  tests:
-    strategy:
-      matrix:
-        python: ["3.9", "3.10"]
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: timescale/timescaledb:2.9.1-pg14
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_PORT: 5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-          pip install -e .
-
-      - name: Run unit tests
-        run: python -m pytest --cov src/ --cov-report=xml
-        env:
-          TEST_TIMESCALE_HOST: localhost
-          TEST_TIMESCALE_PORT: 5432
-          TEST_TIMESCALE_USERNAME: postgres
-          TEST_TIMESCALE_PASSWORD: postgres
-          TEST_DATABASE: binance
-          TEST_SYMBOL: BTCUSDT
-
-      - uses: codecov/codecov-action@v5

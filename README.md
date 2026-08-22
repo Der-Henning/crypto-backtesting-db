@@ -29,7 +29,7 @@ Connect to the PostgresDB as usually:
 - Username: postgres
 - Password: as set in `docker-compose.yml`
 - Database: binance
-- Table: lowercase symbol
+- Table: market
 
 Example SQL Query to create data for the BTC/USDT symbol on 5m interval for the last year from today:
 
@@ -43,11 +43,11 @@ SELECT
     sum(volume) AS volume,
     last(close_time, time) AS close_time,
     sum(quote_asset_volume) AS quote_asset_volume,
-    sum(number_trades) AS number_trades,
+    sum(number_trades) AS number_of_trades,
     sum(taker_buy_base_asset_volume) AS taker_buy_base_asset_volume,
     sum(taker_buy_quote_asset_volume) AS taker_buy_quote_asset_volume
-FROM btcusdt WHERE
-    time > now() - INTERVAL '1 year' AND
-    time <= now()
+FROM market WHERE
+    symbol = 'BTCUSDC'
+    time > now() - INTERVAL '1 year' AND time <= now()
 GROUP BY opentime
 ````

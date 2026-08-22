@@ -1,41 +1,22 @@
-FROM python:3.9 AS builder
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        gcc \
-        python3-dev \
-        libpq-dev
-
-COPY requirements.txt /tmp/pip-tmp/
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-RUN python -m pip install --no-cache-dir --upgrade pip && \
-    python -m pip install --no-cache-dir -r /tmp/pip-tmp/requirements.txt
-
-FROM python:3.9-slim
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        libpq-dev && \
-    apt-get clean && \
-        rm -rf \
-        /tmp/* \
-        /var/lib/apt/lists/* \
-        /var/tmp/*
-
-RUN addgroup --gid 1001 --system crypto && \
-    adduser --shell /bin/false --disabled-password --uid 1001 --system --group crypto
-RUN mkdir -p /app
-RUN chown crypto:crypto /app
-
-USER crypto
+FROM rust:1-bookworm AS builder
 
 WORKDIR /app
 
-ENV PATH="/opt/venv/bin:$PATH"
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
 
-COPY --from=builder /opt/venv /opt/venv
+RUN cargo build --release --locked
 
-COPY --chown=crypto:crypto ./src .
+FROM debian:bookworm-slim
 
-CMD [ "python", "-u", "runner.py" ]
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd --gid 1001 --system crypto && \
+    useradd --uid 1001 --gid crypto --system --no-create-home --shell /usr/sbin/nologin crypto
+
+COPY --from=builder /app/target/release/crypto-db /usr/local/bin/crypto-db
+
+USER crypto
+
+ENTRYPOINT ["/usr/local/bin/crypto-db"]
